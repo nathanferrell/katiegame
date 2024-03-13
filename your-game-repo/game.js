@@ -1,8 +1,13 @@
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
-const infoDiv = document.getElementById('info');
-const img = new Image();
-const differenceAreas = [
+document.addEventListener('DOMContentLoaded', (event) => {
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const infoDiv = document.getElementById('info');
+    const img = new Image();
+    let foundDifferences = [];
+    let timer = null;
+    let gameComplete = false;
+
+    const differenceAreas = [
     [92, 308, 111, 332],
     [296, 297, 360, 332],
     [422, 371, 422, 386],
@@ -27,54 +32,58 @@ const differenceAreas = [
     [200, 424, 223, 446],
     [150, 414, 170, 430],
     [229, 485, 248, 506]
-];
-let foundDifferences = [];
-let startTime, timerId;
+    ];
 
-img.onload = function() {
-    ctx.drawImage(img, 0, 0);
-    startTime = new Date();
-    updateTimer();
-};
-img.src = 'images/cropkatietest.png'; // Ensure this points to your image file
 
-canvas.addEventListener('click', function(event) {
-    const rect = canvas.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-    checkDifference(x, y);
-});
+    img.onload = function() {
+        ctx.drawImage(img, 0, 0);
+        startTimer();
+    };
+    img.src = 'images/cropkatietest.png'; // Ensure this path matches your structure
 
-function checkDifference(x, y) {
-    for (let i = 0; i < differenceAreas.length; i++) {
-        const [x1, y1, x2, y2] = differenceAreas[i];
-        if (x >= x1 && x <= x2 && y >= y1 && y <= y2) {
-            if (!foundDifferences.includes(i)) {
+    canvas.addEventListener('click', function(event) {
+        if (gameComplete) return; // Stops handling clicks after game completion
+
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        checkDifference(x, y);
+    });
+
+    function checkDifference(x, y) {
+        for (let i = 0; i < differenceAreas.length; i++) {
+            const [x1, y1, x2, y2] = differenceAreas[i];
+            if (x >= x1 && x <= x2 && y >= y1 && y <= y2 && !foundDifferences.includes(i)) {
                 foundDifferences.push(i);
-                drawHighlight(x1, y1, x2, y2);
+                drawHighlight(x1, y1, x2 - x1, y2 - y1); // Note the adjustment for rectangle dimensions
                 infoDiv.textContent = `Difference found! Total found: ${foundDifferences.length}`;
                 if (foundDifferences.length === differenceAreas.length) {
-                    clearInterval(timerId);
-                    infoDiv.textContent += " All differences found!";
+                    clearInterval(timer); // Stops the timer when all differences are found
+                    gameComplete = true;
+                    infoDiv.textContent += " | All differences found!";
                 }
                 return;
             }
         }
     }
-}
 
-function drawHighlight(x1, y1, x2, y2) {
-    ctx.strokeStyle = 'lime';
-    ctx.lineWidth = 5;
-    ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
-}
+    function drawHighlight(x, y, width, height) {
+        ctx.strokeStyle = 'lime';
+        ctx.lineWidth = 5;
+        ctx.strokeRect(x, y, width, height); // Draw highlight rectangle
+    }
 
-function updateTimer() {
-    timerId = setInterval(() => {
-        const now = new Date();
-        const elapsed = new Date(now - startTime);
-        const minutes = elapsed.getUTCMinutes();
-        const seconds = elapsed.getUTCSeconds();
-        infoDiv.textContent = `Time: ${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
-    }, 1000);
-}
+    function startTimer() {
+        const startTime = Date.now();
+        timer = setInterval(() => {
+            if (gameComplete) {
+                clearInterval(timer);
+                return;
+            }
+            const elapsedTime = Date.now() - startTime;
+            const minutes = Math.floor(elapsedTime / 60000);
+            const seconds = Math.floor((elapsedTime % 60000) / 1000);
+            infoDiv.textContent = `Time: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        }, 1000);
+    }
+});
