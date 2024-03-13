@@ -39,7 +39,8 @@ document.addEventListener('DOMContentLoaded', (event) => {
         ctx.drawImage(img, 0, 0);
         startTimer();
     };
-    img.src = 'images/cropkatietest.png'; // Ensure this path matches your structure
+    img.src = 'https://nathanferrell.github.io/katiegame/images/cropkatietest.png';
+ 
 
     canvas.addEventListener('click', function(event) {
         if (gameComplete) return; // Stops handling clicks after game completion
