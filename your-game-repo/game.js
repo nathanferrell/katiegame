@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', (event) => {
                 foundDifferences.push(i);
                 drawHighlight(x1, y1, x2 - x1, y2 - y1); // Note the adjustment for rectangle dimensions
                 infoDiv.textContent = `Difference found! Total found: ${foundDifferences.length}`;
-                if (foundDifferences.length === differenceAreas.length) {
+                if (foundDifferences.length === 23) {
                     clearInterval(timer); // Stops the timer when all differences are found
                     gameComplete = true;
                     infoDiv.textContent += " | All differences found!";
