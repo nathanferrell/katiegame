@@ -36,7 +36,7 @@ img.onload = function() {
     startTime = new Date();
     updateTimer();
 };
-img.src = 'images/katiecroptest.png'; // Ensure this points to your image file
+img.src = 'images/cropkatietest.png'; // Ensure this points to your image file
 
 canvas.addEventListener('click', function(event) {
     const rect = canvas.getBoundingClientRect();
